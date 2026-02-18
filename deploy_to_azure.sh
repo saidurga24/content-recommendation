@@ -29,7 +29,7 @@ RESOURCE_GROUP="rg-mycontent-p9"
 LOCATION="eastus"
 FUNCTION_APP="func-mycontent-recommendation"
 BLOB_CONTAINER="deployments"
-PYTHON_VERSION="3.13"
+PYTHON_VERSION="3.11"
 
 # Colors
 RED='\033[0;31m'
