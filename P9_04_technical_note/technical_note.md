@@ -79,8 +79,9 @@ The solution is composed of four main components:
                          ▼
 ┌─────────────────────────────────────────────────────────┐
 │                 RECOMMENDATION API                       │
-│            (Flask API / Azure Functions)                 │
-│            localhost:5001 or Azure                       │
+│    (Flask API / Azure Functions)               │
+│    localhost:5001 (local)                        │
+│    func-mycontent-recommendation.azurewebsites.net (Azure) │
 │                                                         │
 │  Endpoints:                                             │
 │  - GET /api/recommend/{user_id}?method=hybrid&n=5       │
@@ -128,7 +129,8 @@ The solution is composed of four main components:
   - Returns top N article recommendations as JSON with scores
   - Supports three recommendation methods selectable via query parameter
   - Provides user listing and health check endpoints
-- **Azure Deployment:** Deployed as a Python v2 programming model Azure Function on a Consumption (Serverless) plan, ensuring pay-per-execution cost efficiency.
+- **Azure Deployment:** Deployed as a Python v2 programming model Azure Function on a Consumption (Serverless) plan using Python 3.11, ensuring pay-per-execution cost efficiency.
+- **Live URL:** `https://func-mycontent-recommendation.azurewebsites.net/api/`
 
 #### 3.3.3 Core ML Module (src/)
 

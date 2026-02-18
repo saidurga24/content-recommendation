@@ -187,11 +187,11 @@ The Flask web application provides:
 4. **Similar Articles** — Search by article ID
 5. **API Status** — Real-time connection status indicator
 
-**API Endpoints:**
-- `GET /api/recommend/{user_id}?method=hybrid&n=5`
-- `GET /api/users`
-- `GET /api/health`
-- `GET /api/similar/{article_id}`
+**API Endpoints (Live on Azure):**
+- `GET https://func-mycontent-recommendation.azurewebsites.net/api/recommend/{user_id}?method=hybrid&n=5`
+- `GET https://func-mycontent-recommendation.azurewebsites.net/api/users`
+- `GET https://func-mycontent-recommendation.azurewebsites.net/api/health`
+- `GET https://func-mycontent-recommendation.azurewebsites.net/api/similar/{article_id}`
 
 ---
 
@@ -323,12 +323,12 @@ Input: User ID → Output: Top 5 recommended articles with scores
 
 **Live demonstration of the application:**
 
-1. Start the Flask API (loads trained models)
-2. Start the Flask web app
-3. Select a user from the dropdown
-4. Choose recommendation method (Hybrid)
-5. View top 5 recommended articles with scores
-6. Search for articles similar to a given article ID
+1. Open Azure Function health check: `https://func-mycontent-recommendation.azurewebsites.net/api/health`
+2. Show users list: `https://func-mycontent-recommendation.azurewebsites.net/api/users`
+3. Get recommendations: `https://func-mycontent-recommendation.azurewebsites.net/api/recommend/102?method=hybrid&n=5`
+4. Start the Flask web app locally (connected to Azure API)
+5. Select a user from the dropdown
+6. View top 5 recommended articles with scores
 
 ---
 

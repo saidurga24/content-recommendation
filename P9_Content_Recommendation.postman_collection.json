@@ -1,0 +1,641 @@
+{
+    "info": {
+        "_postman_id": "p9-content-recommendation",
+        "name": "P9 - Content Recommendation System",
+        "description": "API collection for the My Content Article Recommendation System (Project 9).\n\nIncludes:\n- Azure Functions endpoints (live deployment)\n- Local Flask API endpoints\n- Local Flask Web App endpoints\n\nSwitch between Azure and Local by changing the `base_url` variable.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "azure_url",
+            "value": "https://func-mycontent-recommendation.azurewebsites.net"
+        },
+        {
+            "key": "local_api_url",
+            "value": "http://localhost:5001"
+        },
+        {
+            "key": "local_webapp_url",
+            "value": "http://localhost:5002"
+        },
+        {
+            "key": "base_url",
+            "value": "{{azure_url}}",
+            "description": "Change to {{local_api_url}} for local testing"
+        },
+        {
+            "key": "user_id",
+            "value": "102"
+        },
+        {
+            "key": "article_id",
+            "value": "68866"
+        }
+    ],
+    "item": [
+        {
+            "name": "Azure Functions (Live)",
+            "description": "Live Azure Function endpoints deployed at func-mycontent-recommendation.azurewebsites.net",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{azure_url}}/api/health",
+                            "host": [
+                                "{{azure_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "health"
+                            ]
+                        },
+                        "description": "Check if the Azure Function is healthy and all models are loaded."
+                    }
+                },
+                {
+                    "name": "List Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{azure_url}}/api/users?limit=50",
+                            "host": [
+                                "{{azure_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "50",
+                                    "description": "Max number of users to return (default: 100)"
+                                }
+                            ]
+                        },
+                        "description": "Get list of available user IDs from the CF model."
+                    }
+                },
+                {
+                    "name": "Recommend - Hybrid (default)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{azure_url}}/api/recommend/{{user_id}}?method=hybrid&n=5",
+                            "host": [
+                                "{{azure_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "recommend",
+                                "{{user_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "hybrid",
+                                    "description": "Recommendation method: hybrid, cf, or content"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "5",
+                                    "description": "Number of recommendations to return"
+                                }
+                            ]
+                        },
+                        "description": "Get top 5 article recommendations for a user using the Hybrid method."
+                    }
+                },
+                {
+                    "name": "Recommend - Collaborative Filtering",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{azure_url}}/api/recommend/{{user_id}}?method=cf&n=5",
+                            "host": [
+                                "{{azure_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "recommend",
+                                "{{user_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "cf"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Get recommendations using Collaborative Filtering (SVD) only."
+                    }
+                },
+                {
+                    "name": "Recommend - Content-Based",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{azure_url}}/api/recommend/{{user_id}}?method=content&n=5",
+                            "host": [
+                                "{{azure_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "recommend",
+                                "{{user_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "content"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Get recommendations using Content-Based filtering only."
+                    }
+                },
+                {
+                    "name": "Recommend - 10 items",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{azure_url}}/api/recommend/{{user_id}}?method=hybrid&n=10",
+                            "host": [
+                                "{{azure_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "recommend",
+                                "{{user_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "hybrid"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "10"
+                                }
+                            ]
+                        },
+                        "description": "Get top 10 recommendations to test the n parameter."
+                    }
+                },
+                {
+                    "name": "Recommend - Different User (183)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{azure_url}}/api/recommend/183?method=hybrid&n=5",
+                            "host": [
+                                "{{azure_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "recommend",
+                                "183"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "hybrid"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Test recommendations for a different user to verify personalization."
+                    }
+                },
+                {
+                    "name": "Recommend - Invalid User (error case)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{azure_url}}/api/recommend/999999?method=hybrid&n=5",
+                            "host": [
+                                "{{azure_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "recommend",
+                                "999999"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "hybrid"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Test error handling for a non-existent user ID."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Local Flask API (localhost:5001)",
+            "description": "Local Flask API endpoints. Start with: cd P9_02_azure_function && python app.py",
+            "item": [
+                {
+                    "name": "API Status / Index",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                ""
+                            ]
+                        },
+                        "description": "Get API status, available endpoints, and model loading status."
+                    }
+                },
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/health",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "health"
+                            ]
+                        },
+                        "description": "Health check for the local Flask API."
+                    }
+                },
+                {
+                    "name": "List Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/users?limit=100",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "users"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "100"
+                                }
+                            ]
+                        },
+                        "description": "Get available user IDs."
+                    }
+                },
+                {
+                    "name": "List Articles",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/articles?limit=100",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "articles"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "100"
+                                }
+                            ]
+                        },
+                        "description": "Get available article IDs."
+                    }
+                },
+                {
+                    "name": "Recommend - Hybrid",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/recommend/{{user_id}}?method=hybrid&n=5",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "recommend",
+                                "{{user_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "hybrid"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Get hybrid recommendations from local API."
+                    }
+                },
+                {
+                    "name": "Recommend - CF",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/recommend/{{user_id}}?method=cf&n=5",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "recommend",
+                                "{{user_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "cf"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Get CF-only recommendations from local API."
+                    }
+                },
+                {
+                    "name": "Recommend - Content-Based",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/recommend/{{user_id}}?method=content&n=5",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "recommend",
+                                "{{user_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "content"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Get content-based recommendations from local API."
+                    }
+                },
+                {
+                    "name": "Recommend with URL method",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/recommend/{{user_id}}/hybrid?n=5",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "recommend",
+                                "{{user_id}}",
+                                "hybrid"
+                            ],
+                            "query": [
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Alternative endpoint: method specified in URL path instead of query param."
+                    }
+                },
+                {
+                    "name": "Similar Articles",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/similar/{{article_id}}?n=5",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "similar",
+                                "{{article_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Find articles similar to a given article based on content embeddings."
+                    }
+                },
+                {
+                    "name": "Similar Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/similar_users/{{user_id}}?n=10",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "similar_users",
+                                "{{user_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "n",
+                                    "value": "10"
+                                }
+                            ]
+                        },
+                        "description": "Find users similar to a given user (requires user-based CF model)."
+                    }
+                },
+                {
+                    "name": "Reload Models",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_api_url}}/reload_models",
+                            "host": [
+                                "{{local_api_url}}"
+                            ],
+                            "path": [
+                                "reload_models"
+                            ]
+                        },
+                        "description": "Admin endpoint to reload all models from disk."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Local Flask Web App (localhost:5002)",
+            "description": "Web application UI endpoints. Start with: cd P9_03_web_app && python app.py",
+            "item": [
+                {
+                    "name": "Home Page (UI)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_webapp_url}}/",
+                            "host": [
+                                "{{local_webapp_url}}"
+                            ],
+                            "path": [
+                                ""
+                            ]
+                        },
+                        "description": "Main web application page with user selection, method selection, and recommendation display."
+                    }
+                },
+                {
+                    "name": "Web App - Health Check Proxy",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_webapp_url}}/api/health",
+                            "host": [
+                                "{{local_webapp_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "health"
+                            ]
+                        },
+                        "description": "Web app proxy endpoint that checks if the recommendation API is reachable."
+                    }
+                },
+                {
+                    "name": "Web App - Users Proxy",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_webapp_url}}/api/users?limit=200",
+                            "host": [
+                                "{{local_webapp_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "users"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "200"
+                                }
+                            ]
+                        },
+                        "description": "Web app proxy that fetches user list from the recommendation API."
+                    }
+                },
+                {
+                    "name": "Web App - Recommend Proxy",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_webapp_url}}/api/recommend/{{user_id}}?method=hybrid&n=5",
+                            "host": [
+                                "{{local_webapp_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "recommend",
+                                "{{user_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "method",
+                                    "value": "hybrid"
+                                },
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Web app proxy for getting recommendations."
+                    }
+                },
+                {
+                    "name": "Web App - Similar Articles Proxy",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{local_webapp_url}}/api/similar/{{article_id}}?n=5",
+                            "host": [
+                                "{{local_webapp_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "similar",
+                                "{{article_id}}"
+                            ],
+                            "query": [
+                                {
+                                    "key": "n",
+                                    "value": "5"
+                                }
+                            ]
+                        },
+                        "description": "Web app proxy for finding similar articles."
+                    }
+                }
+            ]
+        }
+    ]
+}

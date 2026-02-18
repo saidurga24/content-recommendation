@@ -454,7 +454,7 @@ The Flask web application provides a user-friendly interface for:
    - Use VS Code Azure Functions extension
    - Or use Azure CLI:
    ```bash
-   func azure functionapp publish <function-app-name>
+   func azure functionapp publish func-mycontent-recommendation
    ```
 
 3. **Upload Models to Blob Storage**
@@ -478,12 +478,12 @@ cp local.settings.json.example local.settings.json
 func start
 ```
 
-### Azure Function Endpoints
+### Azure Function Endpoints (Live)
 
 ```
-https://<function-app-name>.azurewebsites.net/api/recommend/{user_id}
-https://<function-app-name>.azurewebsites.net/api/users
-https://<function-app-name>.azurewebsites.net/api/health
+https://func-mycontent-recommendation.azurewebsites.net/api/recommend/{user_id}
+https://func-mycontent-recommendation.azurewebsites.net/api/users
+https://func-mycontent-recommendation.azurewebsites.net/api/health
 ```
 
 ---
