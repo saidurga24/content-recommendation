@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Content - Article Recommendations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+            <h1>My Content</h1>
+            <p>Article Recommendation System</p>
+            <div id="apiStatus" class="status checking">
+                <span class="dot"></span>
+                <span id="apiStatusText">Checking API...</span>
+            </div>
+        </header>
+
+        <section>
+            <h2>Get Recommendations</h2>
+
+            <label>Method</label>
+            <div class="methods" id="methodPills">
+                <button class="active" data-method="hybrid">Hybrid</button>
+                <button data-method="cf">Collaborative Filtering</button>
+                <button data-method="content">Content-Based</button>
+            </div>
+
+            <div class="row">
+                <div class="field">
+                    <label for="userSelect">User</label>
+                    <select id="userSelect" disabled>
+                        <option value="">Loading users...</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="numRecs">Count</label>
+                    <select id="numRecs">
+                        <option value="5" selected>5</option>
+                        <option value="3">3</option>
+                        <option value="7">7</option>
+                        <option value="10">10</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="getRecsBtn" disabled>Recommend</button>
+            </div>
+
+            <div id="recsResults" class="results hidden"></div>
+        </section>
+
+        <section>
+            <h2>Find Similar Articles</h2>
+            <div class="row">
+                <div class="field">
+                    <label for="articleIdInput">Article ID</label>
+                    <input type="number" id="articleIdInput" placeholder="e.g. 157541">
+                </div>
+                <button class="btn btn-secondary" id="findSimilarBtn">Find Similar</button>
+            </div>
+            <div id="similarResults" class="results hidden"></div>
+        </section>
+
+        <footer>My Content &mdash; OpenClassrooms Project 9</footer>
+
+    </div>
+
+    <script>
+        (function () {
+            const $ = (id) => document.getElementById(id);
+
+            const apiStatus = $('apiStatus');
+            const apiStatusText = $('apiStatusText');
+            const userSelect = $('userSelect');
+            const numRecs = $('numRecs');
+            const getRecsBtn = $('getRecsBtn');
+            const recsResults = $('recsResults');
+            const methodPills = $('methodPills');
+            const articleInput = $('articleIdInput');
+            const findBtn = $('findSimilarBtn');
+            const similarResults = $('similarResults');
+
+            let method = 'hybrid';
+
+            // Health check
+            async function checkHealth() {
+                try {
+                    const r = await fetch('/api/health');
+                    if (r.ok) {
+                        apiStatus.className = 'status connected';
+                        apiStatusText.textContent = 'API connected';
+                        loadUsers();
+                    } else { throw 0; }
+                } catch {
+                    apiStatus.className = 'status disconnected';
+                    apiStatusText.textContent = 'API unavailable';
+                }
+            }
+
+            // Load users
+            async function loadUsers() {
+                try {
+                    const r = await fetch('/api/users?limit=200');
+                    const d = await r.json();
+                    if (d.users && d.users.length) {
+                        userSelect.innerHTML = d.users.map(u => `<option value="${u}">${u}</option>`).join('');
+                        userSelect.disabled = false;
+                        getRecsBtn.disabled = false;
+                    }
+                } catch { }
+            }
+
+            // Method pills
+            methodPills.addEventListener('click', (e) => {
+                if (!e.target.dataset.method) return;
+                methodPills.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                method = e.target.dataset.method;
+            });
+
+            // Recommend
+            getRecsBtn.addEventListener('click', async () => {
+                const uid = userSelect.value;
+                if (!uid) return;
+                getRecsBtn.disabled = true;
+                getRecsBtn.innerHTML = '<span class="spinner"></span>';
+                recsResults.classList.remove('hidden');
+                recsResults.innerHTML = '<div class="empty">Loading...</div>';
+
+                try {
+                    const r = await fetch(`/api/recommend/${uid}?method=${method}&n=${numRecs.value}`);
+                    const d = await r.json();
+                    if (d.error) { recsResults.innerHTML = `<div class="error">${d.error}</div>`; return; }
+
+                    const recs = d.recommendations || [];
+                    if (!recs.length) { recsResults.innerHTML = '<div class="empty">No recommendations found.</div>'; return; }
+
+                    recsResults.innerHTML = `<div class="results-header">${recs.length} results for user ${d.user_id} (${d.method})</div>` +
+                        recs.map((r, i) =>
+                            `<div class="result-item"><span class="rank">${i + 1}.</span><span class="article">Article ${r.article_id}</span><span class="score">${r.score.toFixed(4)}</span></div>`
+                        ).join('');
+                } catch (e) {
+                    recsResults.innerHTML = `<div class="error">${e.message}</div>`;
+                } finally {
+                    getRecsBtn.textContent = 'Recommend';
+                    getRecsBtn.disabled = false;
+                }
+            });
+
+            // Similar
+            findBtn.addEventListener('click', async () => {
+                const aid = articleInput.value;
+                if (!aid) return;
+                findBtn.disabled = true;
+                findBtn.innerHTML = '<span class="spinner"></span>';
+                similarResults.classList.remove('hidden');
+                similarResults.innerHTML = '<div class="empty">Loading...</div>';
+
+                try {
+                    const r = await fetch(`/api/similar/${aid}?n=5`);
+                    const d = await r.json();
+                    if (d.error) { similarResults.innerHTML = `<div class="error">${d.error}</div>`; return; }
+
+                    const items = d.similar_articles || [];
+                    if (!items.length) { similarResults.innerHTML = '<div class="empty">No similar articles found.</div>'; return; }
+
+                    similarResults.innerHTML = `<div class="results-header">Articles similar to ${d.article_id}</div>` +
+                        items.map((a, i) =>
+                            `<div class="result-item"><span class="rank">${i + 1}.</span><span class="article">Article ${a.article_id}</span><span class="score">${a.similarity.toFixed(4)}</span></div>`
+                        ).join('');
+                } catch (e) {
+                    similarResults.innerHTML = `<div class="error">${e.message}</div>`;
+                } finally {
+                    findBtn.textContent = 'Find Similar';
+                    findBtn.disabled = false;
+                }
+            });
+
+            checkHealth();
+            setInterval(checkHealth, 30000);
+        })();
+    </script>
+
+</body>
+
+</html>
